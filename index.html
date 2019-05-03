@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Currencies</title>
+	<link href="https://fonts.googleapis.com/css?family=Play&amp;subset=cyrillic" rel="stylesheet">
+	<style>
+
+		
+	</style>
+</head>
+<body>
+
+	<button id="btn">Загрузить </button>
+	<script>
+		const cbrURL = "https://www.cbr.ru/scripts/XML_daily.asp";
+
+    async function loadCurrency() {
+      const response = await fetch(cbrURL);
+      const xmlTest = await response.text();
+      const parser = new DOMParser();
+      const currencyData = parser.parseFromString(xmlTest, "text/xml");
+      const currencyDate = currencyData.querySelector("ValCurs").getAttribute("Date");
+      const courses = currencyData.querySelectorAll("Valute[ID]");
+      const result = Object.create(null);
+      result[date] = currencyDate;
+      for (let i = 0; i < courses.length; i++) {
+        const currencyCode = courses.querySelector('CharCode').textContent;
+        const currencyName = courses.querySelector('Name').textContent;
+        const currencyNominal = courses.querySelector('Nominal').textContent;
+        const currencyValue = courses.querySelector('Value').textContent;
+        const curencyItem = Object.create(null);
+        curencyItem["name"] = currencyName;
+        curencyItem["nominal"] = currencyNominal;
+        curencyItem["value"] = currencyValue;
+        result["currency"][currencyCode] = curencyItem;
+      };
+      return result;
+    };
+
+    const buttonBuild = document.getElementById("btn");
+    buttonBuild.addEventListener("click", async function() {
+      const currencyData = await loadCurrency();
+      console.log(currencyData);
+    });
+		
+	</script>
+</body>
+</html>
