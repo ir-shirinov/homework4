@@ -13,9 +13,28 @@
 
 	<button id="btn">Загрузить </button>
 	<script>
+    var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+
+    var xhr = new XHR();
+
+    // (2) запрос на другой домен :)
+    xhr.open('GET', 'http://anywhere.com/request', true);
+
+    xhr.onload = function() {
+      alert( this.responseText );
+    }
+
+    xhr.onerror = function() {
+      alert( 'Ошибка ' + this.status );
+    }
+
+    xhr.send();
+    console.log(xhr.response);
+
 		const cbrURL = "https://www.cbr.ru/scripts/XML_daily.asp";
 
     async function loadCurrency() {
+      console.log("hi");
       const response = await fetch(cbrURL);
       const xmlTest = await response.text();
       const parser = new DOMParser();
@@ -24,6 +43,7 @@
       const courses = currencyData.querySelectorAll("Valute[ID]");
       const result = Object.create(null);
       result[date] = currencyDate;
+      console.log(currencyDate);
       for (let i = 0; i < courses.length; i++) {
         const currencyCode = courses.querySelector('CharCode').textContent;
         const currencyName = courses.querySelector('Name').textContent;
